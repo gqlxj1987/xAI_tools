@@ -6,9 +6,10 @@ import { createOpenAIClient } from '../ai/client.js';
 import { withJsonRetry } from '../ai/parse.js';
 import { readFileIfExists, writeFile } from '../io/files.js';
 import { fromCsv, toCsv } from '../io/csv.js';
-import { normalizeTask } from '../normalize/task.js';
+import { parseCsvFromMessage } from '../parse/task-csv.js';
 import { connectCdp } from '../scrape/cdp.js';
-import { collectTasksFromPage, filterTasksByLocalDate } from '../scrape/tasks.js';
+import { fetchConversationResponses, fetchLatestTaskResult, fetchTasks } from '../scrape/grok.js';
+import { getDateKey } from '../scrape/tasks.js';
 
 export function buildPipelineInput(rows) {
   return buildPromptInput(rows);
@@ -67,13 +68,55 @@ export async function runPipeline(env, argv) {
   if (!skipScrape) {
     const browser = await connectCdp(env);
     const context = browser.contexts()[0] || await browser.newContext();
-    const page = context.pages()[0] || await context.newPage();
-    const tasks = await collectTasksFromPage(page, {
-      maxScrolls: 40,
-      scrollDelayMs: 800
+    const page = await context.newPage();
+    await page.goto('https://grok.com/tasks', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1000);
+
+    const tasksData = await fetchTasks(page);
+    const taskItems = tasksData.tasks || [];
+    const latestResults = [];
+    for (const item of taskItems) {
+      const taskId = item.task?.taskId;
+      if (!taskId) {
+        continue;
+      }
+      const resultData = await fetchLatestTaskResult(page, taskId);
+      const result = resultData.results?.[0];
+      if (result) {
+        latestResults.push(result);
+      }
+    }
+
+    const resultsToday = latestResults.filter((result) => {
+      if (!result.createTime) {
+        return false;
+      }
+      return getDateKey(result.createTime, runtime.timeZone) === dateKey;
     });
-    const normalized = tasks.map((task) => normalizeTask(task));
-    rows = filterTasksByLocalDate(normalized, dateKey, runtime.timeZone);
+
+    const allRows = [];
+    for (const result of resultsToday) {
+      const convoId = result.conversationId;
+      if (!convoId) {
+        continue;
+      }
+      await page.goto(`https://grok.com/c/${convoId}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(1000);
+      const responsesData = await fetchConversationResponses(page, convoId);
+      const responses = responsesData.responses || [];
+      const assistant = responses.find((res) => res.sender === 'assistant');
+      const parsed = parseCsvFromMessage(assistant?.message || '');
+      allRows.push(...parsed);
+    }
+
+    const unique = new Map();
+    for (const row of allRows) {
+      if (!row.tweet_id) {
+        continue;
+      }
+      unique.set(row.tweet_id, row);
+    }
+    rows = Array.from(unique.values());
     const csv = toCsv(rows);
     await writeFile(rawCsv, csv);
     await browser.close();
