@@ -27,6 +27,7 @@ Required variables:
 
 Optional variables:
 - `OPENAI_MODEL` (default: `mimo-v2-flash`)
+- `OPENAI_BASE_URL` (default: `https://api.openai.com/v1`)
 - `PROMPT_PATH` (default: `prompts/grok_tasks_prompt.txt`)
 - `CDP_PORT` (default: `9222`)
 - `TASKS_TIMEZONE` (default: local system timezone)
@@ -39,6 +40,7 @@ google-chrome --remote-debugging-port=9222 --user-data-dir=./chrome-profile
 ```
 
 Ensure you can visit `https://grok.com/tasks` in that Chrome instance. The script will connect to the first available tab/context and navigate if needed.
+If you use system proxies, the script will auto-append localhost to `NO_PROXY` to avoid CDP 400 errors.
 
 ## Run
 Fetch today’s tasks and parse:

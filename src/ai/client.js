@@ -5,5 +5,6 @@ export function createOpenAIClient(env) {
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY is required');
   }
-  return new OpenAI({ apiKey });
+  const baseURL = env.OPENAI_BASE_URL?.trim();
+  return new OpenAI({ apiKey, baseURL: baseURL || undefined });
 }
