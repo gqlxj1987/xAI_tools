@@ -9,7 +9,15 @@ test('createOpenAIClient throws when api key missing', () => {
 test('createOpenAIClient uses base url when provided', () => {
   const client = createOpenAIClient({
     OPENAI_API_KEY: 'test-key',
+    OPENAI_BASE_URL: 'http://example/v1'
+  });
+  assert.equal(client.baseURL, 'http://example/v1');
+});
+
+test('createOpenAIClient appends v1 when missing', () => {
+  const client = createOpenAIClient({
+    OPENAI_API_KEY: 'test-key',
     OPENAI_BASE_URL: 'http://example'
   });
-  assert.equal(client.baseURL, 'http://example');
+  assert.equal(client.baseURL, 'http://example/v1');
 });

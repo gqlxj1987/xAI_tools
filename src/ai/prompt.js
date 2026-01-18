@@ -10,3 +10,14 @@ export function buildPromptInput(rows) {
     ].join('\n');
   }).join('\n');
 }
+
+export function buildPromptPayload(promptTemplate, input) {
+  return [
+    promptTemplate,
+    '',
+    'Return ONLY Markdown that follows the requested sections.',
+    'No JSON, no code fences, no extra commentary.',
+    '',
+    input
+  ].join('\n');
+}

@@ -5,5 +5,5 @@ import { getOutputPaths } from '../src/config/paths.js';
 test('getOutputPaths returns date-based file paths', () => {
   const paths = getOutputPaths('2026-01-18');
   assert.equal(paths.rawCsv, 'data/raw/tasks_2026-01-18.csv');
-  assert.equal(paths.parsedJson, 'data/parsed/tasks_2026-01-18.json');
+  assert.equal(paths.summaryMd, 'data/parsed/tasks_2026-01-18.md');
 });

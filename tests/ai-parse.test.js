@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { withJsonRetry } from '../src/ai/parse.js';
+import { withOutputRetry } from '../src/ai/parse.js';
 
-const good = async () => '{"ok":true}';
+const good = async () => 'ok';
 
-test('withJsonRetry returns parsed json', async () => {
-  const out = await withJsonRetry(good, 1);
-  assert.equal(out.ok, true);
+test('withOutputRetry returns non-empty text', async () => {
+  const out = await withOutputRetry(good, 1);
+  assert.equal(out, 'ok');
 });

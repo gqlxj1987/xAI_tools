@@ -1,5 +1,7 @@
 # Grok Tasks Pipeline Implementation Plan
 
+> 备注：当前实现已调整为输出 Markdown（非 JSON），且抓取阶段改为在页面上下文内调用内部接口获取数据。本文档保留为历史实现规划参考。
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build a Node.js + Playwright (CDP) pipeline that scrapes today's grok.com/tasks into CSV, then uses OpenAI to generate structured JSON.

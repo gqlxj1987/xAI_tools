@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "run:tasks": "node scripts/run-tasks.js"
+    "run:tasks": "node scripts/run-tasks.js",
+    "run:today": "bash scripts/run-daily.sh"
   },
   "dependencies": {
     "csv-parse": "^5.5.6",
