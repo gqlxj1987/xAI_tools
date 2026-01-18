@@ -14,6 +14,15 @@ export function ensureNoProxyForLocalhost(env) {
   return entries.join(',');
 }
 
+export async function disconnectCdpBrowser(browser) {
+  if (!browser) {
+    return;
+  }
+  if (typeof browser.close === 'function') {
+    await browser.close();
+  }
+}
+
 export async function connectCdp(env) {
   const noProxy = ensureNoProxyForLocalhost(env);
   process.env.NO_PROXY = noProxy;

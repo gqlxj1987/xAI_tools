@@ -8,7 +8,7 @@ import { getChatCompletionOutput } from '../ai/output.js';
 import { readFileIfExists, writeFile } from '../io/files.js';
 import { fromCsv, toCsv } from '../io/csv.js';
 import { parseCsvFromMessage } from '../parse/task-csv.js';
-import { connectCdp } from '../scrape/cdp.js';
+import { connectCdp, disconnectCdpBrowser } from '../scrape/cdp.js';
 import { fetchConversationResponses, fetchLatestTaskResult, fetchTasks } from '../scrape/grok.js';
 import { getDateKey } from '../scrape/tasks.js';
 
@@ -146,7 +146,7 @@ export async function runPipeline(env, argv) {
       }
       if (browser) {
         try {
-          await browser.disconnect();
+          await disconnectCdpBrowser(browser);
         } catch (err) {
           console.warn('Failed to disconnect browser', err);
         }
