@@ -39,6 +39,12 @@ cp .env.example .env
 google-chrome --remote-debugging-port=9222 --user-data-dir=./chrome-profile
 ```
 
+macOS 可使用：
+
+```bash
+open -n -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir="/tmp/chrome_dev_test"
+```
+
 确保该 Chrome 实例可以访问 `https://grok.com/tasks`。脚本会连接到第一个可用的 tab/context，并在需要时进行导航。
 如使用系统代理，脚本会自动将 localhost 追加到 `NO_PROXY`，避免 CDP 400 错误。
 
